@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brute Force Attack Detector - פרויקט סייבר מתקדם</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        header h1 {
+            color: #c0392b;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header .subtitle {
+            color: #2c3e50;
+            font-size: 1.2em;
+            font-weight: 300;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        nav a {
+            color: #2c3e50;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        nav a:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        /* Sections */
+        section {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        section h2 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-right: 5px solid #667eea;
+            padding-right: 20px;
+        }
+
+        section h3 {
+            color: #34495e;
+            font-size: 1.5em;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        /* Alert boxes */
+        .alert {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border-right: 5px solid;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            border-color: #17a2b8;
+            color: #0c5460;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            direction: ltr;
+            text-align: left;
+        }
+
+        .code-block code {
+            color: #1abc9c;
+        }
+
+        /* Features grid */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature-card h4 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+
+        /* Pros and Cons */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .pros, .cons {
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        .pros {
+            background: #d4edda;
+            border-right: 5px solid #28a745;
+        }
+
+        .cons {
+            background: #f8d7da;
+            border-right: 5px solid #dc3545;
+        }
+
+        .pros h4, .cons h4 {
+            font-size: 1.3em;
+            margin-bottom: 15px;
+        }
+
+        .pros ul, .cons ul {
+            list-style: none;
+            padding-right: 20px;
+        }
+
+        .pros li::before {
+            content: "✓ ";
+            color: #28a745;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        .cons li::before {
+            content: "✗ ";
+            color: #dc3545;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        /* Steps */
+        .steps {
+            counter-reset: step-counter;
+        }
+
+        .step {
+            padding: 20px;
+            margin: 20px 0;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border-right: 5px solid #667eea;
+            counter-increment: step-counter;
+            position: relative;
+        }
+
+        .step::before {
+            content: counter(step-counter);
+            position: absolute;
+            right: -15px;
+            top: 20px;
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        /* Button */
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        footer p {
+            color: #2c3e50;
+            font-size: 1.1em;
+        }
+
+        .heart {
+            color: #e74c3c;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8em; }
+            .comparison { grid-template-columns: 1fr; }
+            nav ul { flex-direction: column; }
+        }
+
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        table thead {
+            background: #667eea;
+            color: white;
+        }
+
+        table th, table td {
+            padding: 15px;
+            text-align: right;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tbody tr:hover {
+            background: #f5f5f5;
+        }
+
+        /* Icon styles */
+        .icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🛡️ Brute Force Attack Detector</h1>
+            <p class="subtitle">כלי אבטחה אוטומטי מבוסס בינה מלאכותית לזיהוי והערכת התקפות כוח גס</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav>
+            <ul>
+                <li><a href="#what-is">מה זה ברוט פורס?</a></li>
+                <li><a href="#project">על הפרויקט</a></li>
+                <li><a href="#how-it-works">איך זה עובד?</a></li>
+                <li><a href="#code-explanation-link">הסבר מפורט לקוד</a></li>
+                <li><a href="#pros-cons">יתרונות וחסרונות</a></li>
+                <li><a href="#how-to-run">איך להריץ?</a></li>
+                <li><a href="#disclaimer">דיסקליימר</a></li>
+            </ul>
+        </nav>
+
+        <!-- What is Brute Force -->
+        <section id="what-is">
+            <h2>🔐 מה זה התקפת ברוט פורס (Brute Force)?</h2>
+            
+            <p style="font-size: 1.1em; margin-bottom: 20px;">
+                <strong>התקפת כוח גס (Brute Force Attack)</strong> היא שיטת תקיפה שבה התוקף מנסה לנחש סיסמה או אישור גישה על ידי ניסיון מאות או אלפי צירופים אפשריים עד שהוא מוצא את הצירוף הנכון.
+            </p>
+
+            <div class="alert alert-info">
+                <strong>💡 דוגמה מהחיים האמיתיים:</strong><br>
+                תאר לעצמך מישהו שמנסה לפתוח מנעול קומבינציה. הוא מנסה 0000, 0001, 0002... וכך הלאה עד שהוא מוצא את הקוד הנכון. זה בדיוק העיקרון של התקפת ברוט פורס - רק שבמחשבים זה קורה מהר הרבה יותר.
+            </div>
+
+            <h3>🎯 איך זה עובד?</h3>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon">🔑</div>
+                    <h4>שלב 1: סריקה</h4>
+                    <p>התוקף זיהה את המערכת המטרה ומוצא את נקודת הכניסה (דף התחברות)</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">⚡</div>
+                    <h4>שלב 2: ניסיונות</h4>
+                    <p>התוקף מנסה מאות/אלפי צירופי שם משתמש וסיסמה אוטומטית</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">✅</div>
+                    <h4>שלב 3: פריצה</h4>
+                    <p>כאשר נמצא הצירוף הנכון - התוקף מקבל גישה למערכת!</p>
+                </div>
+            </div>
+
+            <h3>📊 דוגמה מהלוגים שלנו</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>זמן</th>
+                        <th>כתובת IP</th>
+                        <th>פעולה</th>
+                        <th>קוד סטטוס</th>
+                        <th>משמעות</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>08:00</td>
+                        <td>103.45.123.89</td>
+                        <td>POST /api/login</td>
+                        <td>401</td>
+                        <td>❌ כישלון - סיסמה שגויה</td>
+                    </tr>
+                    <tr>
+                        <td>08:00</td>
+                        <td>103.45.123.89</td>
+                        <td>POST /api/login</td>
+                        <td>401</td>
+                        <td>❌ כישלון - ניסיון נוסף</td>
+                    </tr>
+                    <tr>
+                        <td>08:01</td>
+                        <td>103.45.123.89</td>
+                        <td>POST /api/login</td>
+                        <td>401</td>
+                        <td>❌ כישלון - ממשיך לנסות</td>
+                    </tr>
+                    <tr>
+                        <td>08:04</td>
+                        <td>103.45.123.89</td>
+                        <td>POST /api/login</td>
+                        <td>200</td>
+                        <td>✅ הצלחה - נכנס למערכת!</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="alert alert-danger">
+                <strong>⚠️ זיהוי ההתקפה:</strong> שימו לב שאותה כתובת IP (103.45.123.89) ניסתה להתחבר 5 פעמים ב-4 דקות, ובסוף הצליחה! זוהי בדיוק חתימה של התקפת ברוט פורס מוצלחת - <strong>"Succeed-After-Fail"</strong>.
+            </div>
+        </section>
+
+        <!-- Project Overview -->
+        <section id="project">
+            <h2>📋 על הפרויקט</h2>
+            
+            <p style="font-size: 1.1em; margin-bottom: 20px;">
+                הפרויקט הזה נוצר כחלק מלימודי הסייבר שלי, עם מטרה ליצור <strong>כלי אבטחה אוטומטי</strong> שעוזר לאנליסטים במרכזי SOC (Security Operations Center) לזהות התקפות ברוט פורס בזמן אמת.
+            </p>
+
+            <h3>🎯 המטרה</h3>
+            <div class="alert alert-success">
+                <strong>הבעיה שפתרנו:</strong> אנליסטי אבטחה מוצפים באלפי התראות יומיות על ניסיונות התחברות כושלים. רובם הם "רעש" רגיל - אנשים שפשוט שכחו סיסמה. הכלי שלנו מסנן את הרעש ומזהה רק את המקרים החשודים באמת - כאלה שבהם <strong>ההתקפה הצליחה</strong>.
+            </div>
+
+            <h3>🔬 מה הופך את זה למיוחד?</h3>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon">🤖</div>
+                    <h4>בינה מלאכותית</h4>
+                    <p>שימוש ב-Google Gemini ליצירת דוחות מקצועיים אוטומטיים</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🎯</div>
+                    <h4>דיוק גבוה</h4>
+                    <p>זיהוי מדויק של דפוס "Succeed-After-Fail"</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">⚡</div>
+                    <h4>מהירות</h4>
+                    <p>עיבוד אוטומטי של אלפי שורות לוגים בשניות</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📊</div>
+                    <h4>דוחות מקצועיים</h4>
+                    <p>יצירת דוח HTML מעוצב עם המלצות מעשיות</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How It Works -->
+        <section id="how-it-works">
+            <h2>⚙️ איך הכלי עובד?</h2>
+
+            <p style="font-size: 1.1em; margin-bottom: 30px;">
+                הכלי עובד בשלושה שלבים מרכזיים, כל אחד אחראי על חלק אחר בתהליך הזיהוי:
+            </p>
+
+            <div class="steps">
+                <div class="step">
+                    <h3>📂 שלב 1: עיבוד נתונים (Data Processing)</h3>
+                    <p><strong>מה קורה:</strong> הסקריפט קורא את קובץ ה-CSV עם הלוגים של השרת, מסנן שורות לא רלוונטיות, וממיין את הנתונים לפי זמן.</p>
+                    <p><strong>למה זה חשוב:</strong> לוגים של שרת יכולים להכיל מיליוני שורות. אנחנו מתמקדים רק בשורות שקשורות להתחברות (login attempts).</p>
+                    <div class="code-block">
+<code>def load_logs(file_path):
+    df = pd.read_csv(file_path)
+    return df</code>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>🔍 שלב 2: מנוע הזיהוי (Detection Engine)</h3>
+                    <p><strong>מה קורה:</strong> האלגוריתם בודק כל כתובת IP בנפרד ומחפש דפוס חשוד:</p>
+                    <ul style="margin-right: 40px; margin-top: 10px;">
+                        <li>3+ ניסיונות כושלים (קוד 401) מאותה IP</li>
+                        <li>בתוך חלון זמן של 5 דקות</li>
+                        <li>ואז - התחברות מוצלחת (קוד 200/201)</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>זה נקרא:</strong> "Sliding Window Algorithm" - אנחנו "מחליקים" חלון זמן על פני הלוגים ובודקים כל פרק זמן.</p>
+                    <div class="code-block">
+<code>FAILED_ATTEMPTS_THRESHOLD = 3  # כמה ניסיונות כושלים = חשוד?
+TIME_WINDOW_MINUTES = 5         # בכמה זמן?
+FAIL_CODE = 401                 # קוד כישלון
+SUCCESS_CODES = [200, 201]      # קודי הצלחה</code>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>🤖 שלב 3: אינטגרציה עם AI (AI Integration)</h3>
+                    <p><strong>מה קורה:</strong> כל הנתונים שזיהינו נשלחים ל-Google Gemini (מודל AI) שמקבל את התפקיד של "אנליסט SOC".</p>
+                    <p><strong>מה ה-AI מחזיר:</strong></p>
+                    <ul style="margin-right: 40px; margin-top: 10px;">
+                        <li>תקציר מנהלים - מה קרה במילים פשוטות?</li>
+                        <li>הערכת חומרה - קריטי? בינוני? נמוך?</li>
+                        <li>המלצות - מה צריך לעשות עכשיו?</li>
+                        <li>קישור ל-MITRE ATT&CK - למידע מקצועי נוסף</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>הפלט:</strong> קובץ HTML מעוצב שנראה כמו דוח אמיתי של צוות אבטחה!</p>
+                </div>
+            </div>
+
+            <div class="alert alert-info" style="margin-top: 30px;">
+                <strong>💡 הערה חשובה:</strong> ה-AI לא מחליט מה חשוד - הוא רק מסביר את מה שהקוד שלנו כבר מצא. הדיוק הטכני מגיע מהאלגוריתם שכתבנו, לא מה-AI!
+            </div>
+        </section>
+
+        <!-- Code Explanation -->
+        <section id="code-explanation-link">
+            <h2>💻 הסבר מפורט על הקוד</h2>
+            
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 20px; text-align: center;">
+                <h3 style="color: white; font-size: 2em; margin-bottom: 20px;">📚 רוצה להבין כל שורה בקוד?</h3>
+                <p style="font-size: 1.2em; line-height: 2; margin-bottom: 30px;">
+                    יצרתי מדריך מפורט שעובר על כל חלק בסקריפט:<br>
+                    ✅ מה כל פונקציה עושה<br>
+                    ✅ איך לשנות את ההגדרות<br>
+                    ✅ פתרונות לכל החסרונות<br>
+                    ✅ קוד משופר עם דוגמאות
+                </p>
+                <a href="code_explanation.html" class="btn" style="font-size: 1.3em; padding: 20px 40px; background: white; color: #667eea; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+                    🔧 למדריך המפורט
+                </a>
+            </div>
+
+            <div style="margin-top: 40px;">
+                <h3>📸 דוגמאות מהדוח שנוצר</h3>
+                <p style="font-size: 1.1em; margin-bottom: 20px;">
+                    כך נראה הדוח ה-HTML שהכלי שלנו יוצר אוטומטית לאחר זיהוי התקפות:
+                </p>
+                
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h4 style="color: #2c3e50; margin-bottom: 15px;">חלק 1: ניתוח AI בעברית</h4>
+                    <img src="צילום_מסך_2025-12-02_192255.png" alt="דוח אירוע אבטחה עם ניתוח AI" style="width: 100%; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); border: 3px solid #667eea;">
+                    <p style="text-align: center; color: #666; font-style: italic; margin-top: 15px;">
+                        הדוח כולל תקציר מנהלים, הערכת חומרה (קריטי/בינוני/נמוך), והמלצות מעשיות - הכל בעברית!
+                    </p>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                    <h4 style="color: #2c3e50; margin-bottom: 15px;">חלק 2: טבלה טכנית מפורטת</h4>
+                    <img src="צילום_מסך_2025-12-02_192313.png" alt="טבלת תוקפים עם פירוט מלא" style="width: 100%; border-radius: 10px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); border: 3px solid #28a745;">
+                    <p style="text-align: center; color: #666; font-style: italic; margin-top: 15px;">
+                        הטבלה מציגה כל IP חשוד, כמה ניסיונות ביצע, מתי, והאם הצליח לפרוץ (אדום) או נחסם (ירוק)
+                    </p>
+                </div>
+
+                <div class="alert alert-info" style="margin-top: 30px;">
+                    <strong>💡 שימו לב:</strong> הדוח משלב את הטוב משני עולמות:
+                    <ul style="margin-right: 20px; margin-top: 10px; line-height: 2;">
+                        <li><strong>הקוד של Python</strong> - מספק דיוק מתמטי 100% בטבלה</li>
+                        <li><strong>ה-AI של Gemini</strong> - מספק הסבר אנושי וממלצות מקצועיות</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Pros and Cons -->
+        <section id="pros-cons">
+            <h2>⚖️ יתרונות וחסרונות של הכלי</h2>
+
+            <p style="font-size: 1.1em; margin-bottom: 30px;">
+                כמו כל כלי, גם לשלנו יש יתרונות וחסרונות. חשוב להכיר אותם כדי להשתמש בכלי בצורה נכונה:
+            </p>
+
+            <div class="comparison">
+                <div class="pros">
+                    <h4>✅ יתרונות</h4>
+                    <ul>
+                        <li><strong>אוטומציה מלאה</strong> - חוסך שעות עבודה ידנית של אנליסטים</li>
+                        <li><strong>דיוק גבוה</strong> - מזהה בדיוק את דפוס "Succeed-After-Fail"</li>
+                        <li><strong>דוחות מקצועיים</strong> - יוצר דוח HTML מעוצב עם המלצות</li>
+                        <li><strong>גמישות</strong> - ניתן לשנות את סף הרגישות בקלות</li>
+                        <li><strong>תמיכה בעברית</strong> - הדוחות בעברית ברורה וקריאה</li>
+                        <li><strong>חינמי</strong> - משתמש ב-API חינמי של Google</li>
+                        <li><strong>קל ללמידה</strong> - הקוד נכתב בצורה ברורה ומתועדת</li>
+                        <li><strong>מהיר</strong> - מעבד אלפי שורות תוך שניות</li>
+                    </ul>
+                </div>
+
+                <div class="cons">
+                    <h4>❌ חסרונות והגבלות</h4>
+                    <ul>
+                        <li><strong>תלות ב-API חיצוני</strong> - צריך חיבור אינטרנט ומפתח API</li>
+                        <li><strong>הגבלת קצב</strong> - יש מגבלה על כמות הקריאות ל-API</li>
+                        <li><strong>זיהוי רק Brute Force</strong> - לא מזהה סוגי התקפות אחרים</li>
+                        <li><strong>False Negatives אפשריים</strong> - תוקף חכם יכול לעקוף (לחכות יותר מ-5 דקות)</li>
+                        <li><strong>תלות בפורמט הלוג</strong> - עובד רק עם פורמט CSV ספציפי</li>
+                        <li><strong>לא Real-Time</strong> - עובד על לוגים היסטוריים, לא בזמן אמת</li>
+                        <li><strong>AI לא תמיד מדויק</strong> - לפעמים יוצר המלצות כלליות מדי</li>
+                        <li><strong>דורש ידע בסיסי</strong> - צריך להבין Python ולהתקין ספריות</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="alert alert-warning" style="margin-top: 30px;">
+                <strong>⚠️ חשוב לזכור:</strong> הכלי הזה הוא <strong>כלי עזר</strong> לאנליסט אבטחה, לא תחליף לו! האנליסט צריך תמיד לבדוק את הממצאים ולקבל החלטות מושכלות.
+            </div>
+        </section>
+
+        <!-- How to Run -->
+        <section id="how-to-run">
+            <h2>🚀 איך להריץ את הקוד?</h2>
+
+            <p style="font-size: 1.1em; margin-bottom: 30px;">
+                מדריך שלב אחר שלב להרצת הכלי. גם אם אין לך ניסיון ב-Python, תוכל לעקוב!
+            </p>
+
+            <h3>🛠️ הכלים שבהם השתמשתי</h3>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon">🐍</div>
+                    <h4>Python 3</h4>
+                    <p>שפת התכנות - Python 3.8 ומעלה</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🤖</div>
+                    <h4>Google Gemini API</h4>
+                    <p>מודל הבינה המלאכותית - Gemini 2.0 Flash</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">💻</div>
+                    <h4>VMware + Ubuntu</h4>
+                    <p>מכונה וירטואלית עם Ubuntu Linux</p>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">🖥️</div>
+                    <h4>VS Code / Nano</h4>
+                    <p>עורך קוד לכתיבה ועריכה</p>
+                </div>
+            </div>
+
+            <h3>📋 הכנות מקדימות</h3>
+            <div class="steps">
+                <div class="step">
+                    <h3>🔑 קבלת מפתח API של Gemini</h3>
+                    <ol style="margin-right: 40px; line-height: 2;">
+                        <li>היכנס לאתר: <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #667eea;">https://aistudio.google.com/app/apikey</a></li>
+                        <li>התחבר עם חשבון Google שלך</li>
+                        <li>לחץ על "Create API Key"</li>
+                        <li>העתק את המפתח (זה נראה כך: AIzaSy...)</li>
+                        <li>שמור אותו במקום בטוח!</li>
+                    </ol>
+                    <div class="alert alert-warning">
+                        <strong>⚠️ אבטחה:</strong> אל תשתף את המפתח שלך! זה כמו סיסמה - רק לך!
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>📦 התקנת Python וספריות</h3>
+                    <p>פתח טרמינל והרץ את הפקודות הבאות:</p>
+                    <div class="code-block">
+<code># בדיקה שיש Python מותקן
+python3 --version
+
+# התקנת הספריות הנדרשות
+pip install pandas --break-system-packages
+pip install google-generativeai --break-system-packages</code>
+                    </div>
+                    <p style="margin-top: 15px;"><strong>הערה:</strong> הדגל <code>--break-system-packages</code> נדרש ב-Ubuntu לעקיפת הגנות מערכת.</p>
+                </div>
+
+                <div class="step">
+                    <h3>📁 הכנת הקבצים</h3>
+                    <p>צור תיקיית עבודה וארגן את הקבצים:</p>
+                    <div class="code-block">
+<code># יצירת תיקייה לפרויקט
+mkdir brute_force_detector
+cd brute_force_detector
+
+# יצירת תיקיית פלט
+mkdir output
+
+# העתקת הקבצים:
+# - detector.py (הסקריפט)
+# - server_log.csv (הלוגים)</code>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>⚙️ הגדרת המפתח</h3>
+                    <p>פתח את הקובץ <code>detector.py</code> בעורך טקסט ושנה את השורה:</p>
+                    <div class="code-block">
+<code>GEMINI_API_KEY = "PASTE_YOUR_API_KEY_HERE"</code>
+                    </div>
+                    <p style="margin-top: 15px;">הדבק את המפתח שקיבלת בשלב 1 בתוך המרכאות.</p>
+                </div>
+            </div>
+
+            <h3>▶️ הרצת הסקריפט</h3>
+            <div class="code-block">
+<code># הרצה פשוטה
+python3 detector.py
+
+# התוצאות:
+# ✅ suspicious_activity.csv - קובץ עם התוקפים
+# ✅ report.html - הדוח המלא</code>
+            </div>
+
+            <h3>👀 צפייה בתוצאות</h3>
+            <div class="code-block">
+<code># פתיחת הדוח בדפדפן (Linux)
+xdg-open report.html
+
+# או פשוט לחץ פעמיים על הקובץ!</code>
+            </div>
+
+            <div class="alert alert-success" style="margin-top: 30px;">
+                <strong>🎉 זהו! הכלי רץ!</strong> אם הכל עבד כראוי, אתה אמור לראות דוח HTML מעוצב עם כל הממצאים.
+            </div>
+
+            <h3>❓ פתרון בעיות נפוצות</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>בעיה</th>
+                        <th>פתרון</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>❌ שגיאה: "No module named 'pandas'"</td>
+                        <td>הרץ: <code>pip install pandas --break-system-packages</code></td>
+                    </tr>
+                    <tr>
+                        <td>❌ שגיאה: "Invalid API Key"</td>
+                        <td>בדוק שהעתקת את המפתח נכון (בלי רווחים)</td>
+                    </tr>
+                    <tr>
+                        <td>❌ שגיאה: "Error 429" (Rate Limit)</td>
+                        <td>חכה 1-2 דקות ונסה שוב</td>
+                    </tr>
+                    <tr>
+                        <td>❌ שגיאה: "File not found: server_log.csv"</td>
+                        <td>ודא שהקובץ נמצא באותה תיקייה של הסקריפט</td>
+                    </tr>
+                    <tr>
+                        <td>❌ עברית מקולקלת בטרמינל</td>
+                        <td>זה תקין! ההדפסות בטרמינל לא תמיד מציגות עברית. הדוח ה-HTML עובד מצוין</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Challenges and Solutions -->
+        <section id="challenges">
+            <h2>🎯 הקשיים שפתרנו בדרך</h2>
+
+            <p style="font-size: 1.1em; margin-bottom: 30px;">
+                בפיתוח הפרויקט נתקלתי במספר אתגרים טכניים. הנה איך פתרתי אותם:
+            </p>
+
+            <div class="steps">
+                <div class="step">
+                    <h3>🔑 אתגר 1: הגדרת מפתח ה-API</h3>
+                    <p><strong>הבעיה:</strong> בהתחלה הקוד לא "ראה" את המפתח. הבנתי שהשמירה בעורך הטקסט (nano) לא בוצעה כראוי.</p>
+                    <p><strong>הפתרון:</strong> לחצתי Ctrl+O לשמירה, ואז Enter, ואז Ctrl+X ליציאה. חשוב לשמור נכון!</p>
+                </div>
+
+                <div class="step">
+                    <h3>🤖 אתגר 2: שגיאות גרסאות מודל (404)</h3>
+                    <p><strong>הבעיה:</strong> הספרייה לא זיהתה את השמות הישנים של המודלים (gemini-pro).</p>
+                    <p><strong>הפתרון:</strong> כתבתי סקריפט בדיקה שבדק איזה מודלים זמינים, וגיליתי ש-<code>gemini-2.0-flash</code> קיים במערכת.</p>
+                    <div class="code-block">
+<code># הסקריפט שעזר לי למצוא את המודל הנכון:
+import google.generativeai as genai
+genai.configure(api_key="YOUR_KEY")
+for model in genai.list_models():
+    print(model.name)</code>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <h3>⏱️ אתגר 3: שגיאת עומס (Error 429)</h3>
+                    <p><strong>הבעיה:</strong> הרצתי בדיקות מהר מדי והשרת של Google חסם אותי זמנית.</p>
+                    <p><strong>הפתרון:</strong> פשוט חיכיתי 1-2 דקות בין הרצה להרצה. Google נותנת מכסה חינמית נדיבה, אבל צריך לא להגזים.</p>
+                </div>
+
+                <div class="step">
+                    <h3>🔤 אתגר 4: עברית בטרמינל</h3>
+                    <p><strong>הבעיה:</strong> הטרמינל בלינוקס לא יודע להציג עברית - הכל יצא הפוך ומבולגן.</p>
+                    <p><strong>הפתרון:</strong> במקום להדפיס למסך, שיניתי את הקוד ליצור קובץ HTML עם התגית <code>dir="rtl"</code> ו-CSS מתאים. עכשיו הכל נראה מושלם!</p>
+                </div>
+
+                <div class="step">
+                    <h3>📊 אתגר 5: ה-AI "פספס" נתונים</h3>
+                    <p><strong>הבעיה:</strong> כששלחתי ל-AI רשימה ארוכה של תוקפים, הוא החליט לכתוב סיכום כללי במקום לפרט את כל הכתובות.</p>
+                    <p><strong>הפתרון החכם:</strong> הפרדתי את האחריות!</p>
+                    <ul style="margin-right: 40px; margin-top: 10px;">
+                        <li><strong>Python</strong> (הקוד) - אחראי על הדיוק. בונה את הטבלה הטכנית המלאה.</li>
+                        <li><strong>Gemini</strong> (ה-AI) - אחראי על ההסבר. יוצר את הניתוח המילולי וההמלצות.</li>
+                    </ul>
+                    <p style="margin-top: 15px;">בסוף, הקוד "מזריק" את הטבלה של Python לתוך הדוח של ה-AI → דוח מושלם: חכם ומדויק!</p>
+                </div>
+            </div>
+
+            <div class="alert alert-info" style="margin-top: 30px;">
+                <strong>💡 לקח חשוב:</strong> כשעובדים עם AI, חשוב להבין את המגבלות שלו. AI מעולה ליצירת תוכן, אבל לא לדיוק מוחלט של נתונים. זו הסיבה שתמיד נשתמש בקוד לחישובים ואימות!
+            </div>
+        </section>
+
+        <!-- Disclaimer -->
+        <section id="disclaimer">
+            <h2>⚠️ דיסקליימר ואזהרות חשובות</h2>
+
+            <div class="alert alert-danger">
+                <h3 style="margin-top: 0;">🚨 קריטי - קרא בעיון!</h3>
+                <p style="font-size: 1.1em; line-height: 2;">
+                    הכלי הזה נוצר <strong>למטרות חינוכיות בלבד</strong> במסגרת לימודי סייבר. השימוש בו צריך להיות אחראי וחוקי בלבד.
+                </p>
+            </div>
+
+            <h3>⚖️ שימוש חוקי בלבד</h3>
+            <div class="alert alert-warning">
+                <ul style="line-height: 2; margin-right: 20px;">
+                    <li>❌ <strong>אל תשתמש בכלי על מערכות שאינן שייכות לך</strong> ללא אישור מפורש בכתב</li>
+                    <li>❌ <strong>אל תשתמש בכלי לפעילות פלילית</strong> כלשהי - זה עלול להוביל למאסר</li>
+                    <li>❌ <strong>אל תתקוף ארגונים או אתרים</strong> - גם ב"מחקר" - זו פריצה בלתי חוקית</li>
+                    <li>✅ <strong>השתמש רק על מערכות בבעלותך</strong> או על סביבות מעבדה שהוקמו לכך</li>
+                    <li>✅ <strong>השתמש במסגרת חוקית</strong> - כחלק מצוות SOC, בדיקות חדירה מורשות, או מעבדות לימוד</li>
+                </ul>
+            </div>
+
+            <h3>🎓 מטרות חינוכיות</h3>
+            <p style="font-size: 1.05em; line-height: 2;">
+                הפרויקט הזה נועד ללמד על:
+            </p>
+            <ul style="margin-right: 40px; line-height: 2;">
+                <li>איך עובדות התקפות ברוט פורס</li>
+                <li>איך מזהים אותן בלוגי שרת</li>
+                <li>איך בונים כלי אבטחה אוטומטיים</li>
+                <li>איך משלבים AI בתהליכי אבטחה</li>
+                <li>איך כותבים קוד Python נקי ומודולרי</li>
+            </ul>
+
+            <h3>🛡️ אחריות משפטית</h3>
+            <div class="alert alert-danger">
+                <p style="font-size: 1.05em; line-height: 2;">
+                    <strong>אני (שון) והכלי הזה לא אחראים</strong> לכל שימוש לא חוקי או בלתי אתי שתעשה בקוד. 
+                    <strong>האחריות היא שלך בלבד</strong> כמשתמש. שימוש לא מורשה במערכות מחשוב הוא פשע חמור 
+                    לפי סעיף 4 לחוק המחשבים, התשנ"ה-1995, ועלול להוביל למאסר של עד 3 שנים.
+                </p>
+            </div>
+
+            <h3>🔐 אבטחת מידע</h3>
+            <div class="alert alert-warning">
+                <ul style="line-height: 2; margin-right: 20px;">
+                    <li>🔑 <strong>שמור על מפתח ה-API שלך</strong> - אל תשתף אותו ואל תעלה אותו ל-GitHub</li>
+                    <li>📊 <strong>אל תעבד לוגים אמיתיים בענן</strong> - הם יכולים להכיל מידע רגיש</li>
+                    <li>🗑️ <strong>מחק דוחות זמניים</strong> אם הם מכילים נתונים רגישים</li>
+                    <li>🚫 <strong>אל תשמור סיסמאות</strong> או מידע אישי בקוד</li>
+                </ul>
+            </div>
+
+            <h3>⚡ מגבלות טכניות</h3>
+            <p style="font-size: 1.05em; line-height: 2;">
+                שים לב למגבלות הכלי:
+            </p>
+            <ul style="margin-right: 40px; line-height: 2;">
+                <li>הכלי <strong>לא מזהה</strong> סוגי התקפות אחרים מלבד Brute Force</li>
+                <li>הכלי <strong>לא עובד בזמן אמת</strong> - רק על לוגים היסטוריים</li>
+                <li>הכלי <strong>יכול לפספס תוקפים חכמים</strong> שמחכים בין ניסיונות</li>
+                <li>ה-AI <strong>יכול לטעות</strong> - תמיד אמת את הממצאים</li>
+            </ul>
+
+            <h3>📞 דיווח על שימוש לרעה</h3>
+            <p style="font-size: 1.05em;">
+                אם נתקלת במישהו שמשתמש בכלי באופן בלתי חוקי, דווח ל:
+            </p>
+            <ul style="margin-right: 40px;">
+                <li>המשטרה הישראלית: 100</li>
+                <li>המרכז הלאומי לסייבר: <a href="https://www.gov.il/he/departments/units/cyber" target="_blank">www.gov.il/cyber</a></li>
+            </ul>
+
+            <div class="alert alert-success" style="margin-top: 30px;">
+                <strong>✅ שימוש נכון = למידה אפקטיבית!</strong><br>
+                כשמשתמשים בכלי באופן אחראי ואתי, הוא יכול להיות משאב למידה מצוין ולעזור להבין את עולם אבטחת המידע טוב יותר.
+            </div>
+        </section>
+
+        <!-- Summary -->
+        <section id="summary">
+            <h2>📚 לסיכום</h2>
+
+            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px; border-radius: 20px; margin: 30px 0;">
+                <h3 style="color: white; margin-bottom: 20px;">מה למדנו?</h3>
+                <ul style="line-height: 2.5; font-size: 1.1em;">
+                    <li>🔐 <strong>מהי התקפת Brute Force</strong> ואיך היא עובדת</li>
+                    <li>🔍 <strong>איך לזהות אותה</strong> בלוגי שרת</li>
+                    <li>🐍 <strong>איך לכתוב כלי אבטחה ב-Python</strong> מאפס</li>
+                    <li>🤖 <strong>איך לשלב AI</strong> בתהליכי אבטחה</li>
+                    <li>📊 <strong>איך ליצור דוחות מקצועיים</strong> אוטומטית</li>
+                    <li>⚡ <strong>איך לפתור בעיות טכניות</strong> בדרך</li>
+                </ul>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>💡 הצעד הבא:</strong><br>
+                נסה להרחיב את הכלי! אפשר להוסיף:
+                <ul style="margin-right: 20px; margin-top: 10px;">
+                    <li>זיהוי של סוגי התקפות נוספים (SQL Injection, XSS)</li>
+                    <li>שילוב עם מאגר IP Reputation לזיהוי כתובות ידועות</li>
+                    <li>התראות בזמן אמת (Email/SMS)</li>
+                    <li>ממשק ויזואלי (GUI) לשימוש נוח יותר</li>
+                    <li>שמירת היסטוריה ב-Database</li>
+                </ul>
+            </div>
+
+            <div style="text-align: center; margin: 50px 0;">
+                <a href="https://attack.mitre.org/techniques/T1110/" target="_blank" class="btn">
+                    🌐 למד עוד על Brute Force ב-MITRE ATT&CK
+                </a>
+            </div>
+
+            <h3>📥 הורדת הקבצים</h3>
+            
+            <div class="alert alert-success" style="text-align: center; margin-bottom: 30px;">
+                <strong>💾 הורד הכל ביחד!</strong><br>
+                <a href="brute_force_project.zip" download class="btn" style="margin-top: 15px; display: inline-block;">
+                    📦 הורד את כל הפרויקט (ZIP)
+                </a>
+                <p style="margin-top: 10px; font-size: 0.9em;">כולל: הקוד המלא, לוגים לדוגמה, ו-README</p>
+            </div>
+
+            <p style="text-align: center; margin-bottom: 20px;"><strong>או הורד קבצים בנפרד:</strong></p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="icon">🐍</div>
+                    <h4>הקוד המלא</h4>
+                    <p style="margin-bottom: 15px;">detector.py - הסקריפט המלא עם הערות</p>
+                    <a href="detector.py" download class="btn" style="font-size: 0.9em; padding: 10px 20px;">הורד</a>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📊</div>
+                    <h4>לוגים לדוגמה</h4>
+                    <p style="margin-bottom: 15px;">server_log.csv - לוגי שרת לבדיקה</p>
+                    <a href="server_log.csv" download class="btn" style="font-size: 0.9em; padding: 10px 20px;">הורד</a>
+                </div>
+                <div class="feature-card">
+                    <div class="icon">📖</div>
+                    <h4>מדריך מהיר</h4>
+                    <p style="margin-bottom: 15px;">README.md - הוראות התקנה והרצה</p>
+                    <a href="README.md" download class="btn" style="font-size: 0.9em; padding: 10px 20px;">הורד</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p style="font-size: 1.3em; margin-bottom: 10px;">
+                נוצר באהבה <span class="heart">❤️</span> - שון
+            </p>
+            <p style="color: #7f8c8d; margin-top: 5px;">
+                פרויקט סייבר | 2024-2025 | למטרות חינוכיות בלבד
+            </p>
+            <p style="color: #7f8c8d; margin-top: 10px; font-size: 0.9em;">
+                🎓 בוגר קורס סייבר | 🛡️ SOC Analyst in Training | 🐍 Python Security Developer
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+
+        // Add animation on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'opacity 0.5s, transform 0.5s';
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
